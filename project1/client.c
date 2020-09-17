@@ -22,8 +22,10 @@ int main(int argc, char *argv[]){
 	
 	struct sockaddr_in address;
 	
+	char buffer[256];
 	char *hellomsg = "HELLO ";
-	strcat(hellomsg, NID);//concatenate hello with my neu id
+	strcpy(buffer, hellomsg);
+	strcat(buffer, NID);//concatenate hello with my neu id
 	
 	int sock = 0;
 	
@@ -40,7 +42,7 @@ int main(int argc, char *argv[]){
 		printf("Fail to connect!\n");
 	}
 	else{
-		send(sock, hellomsg, strlen(hellomsg), 0);
+		send(sock, buffer, strlen(buffer), 0);
 	}
 	
 	return 0;
