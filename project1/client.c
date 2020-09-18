@@ -67,10 +67,10 @@ int main(int argc, char *argv[]){
 	send(sockfd, buffer, strlen(buffer), 0);
 	printf("Hello message sent!\nmsg: %s", buffer);
 
-	char buffer2[1024];
+	char buffer2[8192];
 	int sflag;
 	
-	if(recv(sockfd, buffer2, strlen(buffer2), 0) == 0 ){
+	if(recv(sockfd, buffer2, strlen(buffer2) - 1, 0) == 0 ){
 		printf("Connection lost!\n");
 	} else {
 		printf("Message recieved!\nmsg: %s\n", buffer2);
