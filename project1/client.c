@@ -67,13 +67,50 @@ int main(int argc, char *argv[]){
 	send(sockfd, buffer, strlen(buffer), 0);
 	printf("Hello message sent!\nmsg: %s", buffer);
 
+	//buffer for recieved message
 	char buffer2[8192];
-	int sflag;
+	int count, i;
+
+	char *countmsg = "cs3700fall2020 COUNT ";
 	
-	if(recv(sockfd, buffer2, strlen(buffer2) - 1, 0) == 0 ){
-		printf("Connection lost!\n");
-	} else {
+	//when recieving message from the server
+	while(recv(sockfd, buffer2, strlen(buffer2) - 1, 0) != 0 ){
 		printf("Message recieved!\nmsg: %s\n", buffer2);
+		// figure out the message type
+		// FIND message
+		if (buffer2[15] == 'F') {
+		
+			// call our count_symbol function 
+			char *tmp = (char *)malloc(strlen(buffer2) * sizeof(char *));
+			for (i = 0; buffer2[i]; i++){
+			tmp[i] = buffer2[i + 22];
+			}
+			i = 0;
+			//count 
+			//printf("\n%s\n", tmp);
+			count = count_symbol(buffer2[20], tmp);
+			free(tmp);
+			//buffer for message to be sent
+			char buffer3[8192];
+			//buffer for count
+			char *cbuffer = (char *)malloc(256 * sizeof(char *));
+			sprintf(cbuffer, "%d", count);
+			strcpy(buffer3, countmsg);
+			strcat(buffer3, cbuffer);
+			strcat(buffer3, "\n");
+			free(cbuffer);
+			// send the count message
+			send(sockfd, buffer3, strlen(buffer3), 0);
+			
+				
+			printf("Count message sent!\nmsg: %s\n", buffer3);
+			
+		} else if(buffer2[15] == 'B') {
+			// close the connection
+			close(sockfd);
+		}
+	
+	
 	}
 	
 	return 0;
