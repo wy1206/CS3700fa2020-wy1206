@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string.h>
@@ -59,13 +60,21 @@ int main(int argc, char *argv[]){
 
 	//buffer for hello message
 	char buffer[1024];
-	char *hellomsg = "HELLO ";
+	char *hellomsg = "cs3700fall2020 HELLO ";
 	strcpy(buffer, hellomsg);
 	strcat(buffer, NID);//concatenate hello with my neu id
 
 	send(sockfd, buffer, strlen(buffer), 0);
-	printf("Hello message sent!\n");
+	printf("Hello message sent!\nmsg: %s", buffer);
+
+	char buffer2[1024];
+	int sflag;
 	
+	if(recv(sockfd, buffer2, strlen(buffer2), 0) == 0 ){
+		printf("Connection lost!\n");
+	} else {
+		printf("Message recieved!\nmsg: %s\n", buffer2);
+	}
 	
 	return 0;
 }
