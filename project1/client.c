@@ -2,7 +2,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
 
 int count_symbol(char symbol, char *str) {
 	int acc, i;
@@ -15,35 +18,54 @@ int count_symbol(char symbol, char *str) {
 
 int main(int argc, char *argv[]){
 	char *HOSTNAME = "3700.network";
-	int PORT = 27993;
+	char *PORT = "27993";
 	char *NID = "001248102\n";
 	//file descriptor for socket
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	
-	struct sockaddr_in address;
+	int status;
+	struct addrinfo hints;
+	memset(&hints, 0, sizeof hints);
+	struct addrinfo *servinfo;
+	
+	// setting up address info
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	
+	if ((status = getaddrinfo(HOSTNAME, PORT, &hints, &servinfo)) != 0) {
+		printf("Fail to get address info!\n");
+	}
+
+	//get the socket file descpritor.
+	int sockfd, new_sockfd;
+	sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo-> ai_protocol);
+
+	// bind it to the port in getaddrinfo
+	bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen);
+
+	
+	if (connect(sockfd, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
+	{
+		printf("Fail to connect!\n");
+		exit(1);
+	}
+	//listen
+	listen(sockfd, 10);
+
+	//accept
+	struct sockaddr_storage new_addr;
+	socklen_t addr_size;
+	new_sockfd = accept(sockfd, (struct sockaddr *)&new_addr, &addr_size);
+
 	//buffer for hello message
 	char buffer[1024];
 	char *hellomsg = "HELLO ";
 	strcpy(buffer, hellomsg);
 	strcat(buffer, NID);//concatenate hello with my neu id
-	
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = inet_addr(HOSTNAME);
-	address.sin_port = htons(PORT);
 
-	if (inet_pton(AF_INET, HOSTNAME, &address.sin_addr) < 0){
-		printf("Invalid address!\n");
-	}
+	send(sockfd, buffer, strlen(buffer), 0);
+	printf("Hello message sent!\n");
 	
-
-	if (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) != 0)
-	{
-		printf("Fail to connect!\n");
-	}
-	else{
-		send(sockfd, buffer, strlen(buffer), 0);
-		printf("Hello message sent!\n");
-	}
 	
 	return 0;
 }
