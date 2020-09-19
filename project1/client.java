@@ -20,6 +20,7 @@ public class client {
 
     Socket sock = null;
 
+    //establish socket connection
     try {
       sock = new Socket(HOSTNAME, PORT);
     } catch (IOException ioe){
