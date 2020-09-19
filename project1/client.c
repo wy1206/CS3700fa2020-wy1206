@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
-
+#define MAXSIZE 8192
 int count_symbol(char symbol, char *str) {
 	int acc, i;
 	acc = 0;
@@ -68,21 +68,22 @@ int main(int argc, char *argv[]){
 	printf("Hello message sent!\nmsg: %s", buffer);
 
 	//buffer for recieved message
-	char buffer2[8192];
+	char buffer2[MAXSIZE];
 	int count, i;
 
 	char *countmsg = "cs3700fall2020 COUNT ";
 	
 	//when recieving message from the server
-	while(recv(sockfd, buffer2, strlen(buffer2) - 1, 0) != 0 ){
+	while(1){
+	if(recv(sockfd, buffer2, MAXSIZE - 1, 0) != 0 ){
 		printf("Message recieved!\nmsg: %s\n", buffer2);
 		// figure out the message type
 		// FIND message
 		if (buffer2[15] == 'F') {
 		
-			// call our count_symbol function 
+			// call my count_symbol function 
 			char *tmp = (char *)malloc(strlen(buffer2) * sizeof(char *));
-			for (i = 0; buffer2[i]; i++){
+			for (i = 0; buffer2[i] || buffer2[i] == '\n'; i++){
 			tmp[i] = buffer2[i + 22];
 			}
 			i = 0;
@@ -102,15 +103,16 @@ int main(int argc, char *argv[]){
 			// send the count message
 			send(sockfd, buffer3, strlen(buffer3), 0);
 			
-				
+			buffer2[0] = '\0';		
 			printf("Count message sent!\nmsg: %s\n", buffer3);
 			
 		} else if(buffer2[15] == 'B') {
 			// close the connection
 			close(sockfd);
+			}
+	
+	
 		}
-	
-	
 	}
 	
 	return 0;
