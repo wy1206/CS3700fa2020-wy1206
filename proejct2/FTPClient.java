@@ -104,7 +104,7 @@ public class FTPClient {
               + addrs[1] + "." + addrs[2] + "." + addrs[3];
       // get the correct host of the ip address (last two numbers)
       dataPort = (Integer.parseInt((addrs[4])) << 8) + Integer.parseInt(
-              addrs[5].replaceAll("\\)|\\.", ""));
+              addrs[5].replaceAll("[).]", ""));
 
       System.out.println(dataHost);
 
