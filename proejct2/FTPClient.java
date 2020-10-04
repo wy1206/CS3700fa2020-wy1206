@@ -19,7 +19,7 @@ public class FTPClient {
 
   /**
    * Read the URL from the parameters.
-   * make it recognizable in a format of
+   * make it recognizable in a format of ftp://[username:[password]@]host[:port]/path
    */
   private static String ReadURL(String url) {
     String[] path = url.split("://|@|:");
@@ -205,7 +205,7 @@ public class FTPClient {
   public static void main(String[] args) throws Exception {
     int flag = 0; // flag for STOR/RETR, 0:=LIST, 1:=STOR, 2:=RETR 3:= error
     String operation, param1 = "", param2 = "";
-    operation = args[0];
+
     if (args.length == 2 && args[1].startsWith("ftp")) {
       param1 = ReadURL(args[1]);
     }
@@ -219,8 +219,18 @@ public class FTPClient {
       flag += 1;
       }
     } else {
-      System.out.println("Invalid command!");
+      System.out.println("Invalid operation! \n" +
+              "Usage: operation <URL1> (<URL2>)\n" +
+              "1. ls <URL>\n" +
+              "2. mkdir <URL>\n" +
+              "3. rm <URL>\n" +
+              "4. rmdir <URL>\n" +
+              "5. cp <ARG1> <ARG2>\n" +
+              "6. mv <ARG1> <ARG2>\n");
+      System.exit(1);
     }
+
+    operation = args[0];
 
     try {
       connectControl(host, port, username, password);
@@ -301,6 +311,7 @@ public class FTPClient {
                 "4. rmdir <URL>\n" +
                 "5. cp <ARG1> <ARG2>\n" +
                 "6. mv <ARG1> <ARG2>\n");
+        System.exit(1);
     }
     disconnect();
   }
